@@ -3,6 +3,8 @@
  */
 package discord.bot.kotlin
 
+import discord.bot.kotlin.application.impl.ComputeEngineServiceImpl
+
 class App {
     val greeting: String
         get() {
@@ -11,5 +13,6 @@ class App {
 }
 
 fun main(args: Array<String>) {
-    println(App().greeting)
+//    println(App().greeting)
+    ComputeEngineServiceImpl().startInstance()
 }
