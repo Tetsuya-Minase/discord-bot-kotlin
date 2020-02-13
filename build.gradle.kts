@@ -9,6 +9,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    google()
 }
 
 dependencies {
@@ -17,7 +18,11 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     // google compute engine api
-    compile("com.google.apis:google-api-services-compute:v1-rev214-1.25.0")
+    compile("com.google.apis:google-api-services-compute:v1-rev20190905-1.30.3")
+    compile("com.google.api-client:google-api-client:1.30.8")
+    compile("com.google.auth:google-auth-library-oauth2-http:0.20.0")
+    compile("com.fasterxml.jackson.core:jackson-core:2.10.2")
+
 }
 
 application {

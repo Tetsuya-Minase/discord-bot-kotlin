@@ -5,14 +5,6 @@ package discord.bot.kotlin
 
 import discord.bot.kotlin.application.impl.ComputeEngineServiceImpl
 
-class App {
-    val greeting: String
-        get() {
-            return "Hello world."
-        }
-}
-
 fun main(args: Array<String>) {
-//    println(App().greeting)
-    ComputeEngineServiceImpl().startInstance()
+  ComputeEngineServiceImpl().startInstance()
 }
