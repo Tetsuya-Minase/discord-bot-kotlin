@@ -3,13 +3,8 @@
  */
 package discord.bot.kotlin
 
-class App {
-    val greeting: String
-        get() {
-            return "Hello world."
-        }
-}
+import discord.bot.kotlin.application.impl.ComputeEngineServiceImpl
 
 fun main(args: Array<String>) {
-    println(App().greeting)
+  ComputeEngineServiceImpl().startInstance()
 }

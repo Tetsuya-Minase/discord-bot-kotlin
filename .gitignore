@@ -6,3 +6,6 @@ build
 
 # editor
 /.idea
+
+# credentials
+credential/
