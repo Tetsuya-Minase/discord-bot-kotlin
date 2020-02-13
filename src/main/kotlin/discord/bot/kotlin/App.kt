@@ -3,8 +3,9 @@
  */
 package discord.bot.kotlin
 
-import discord.bot.kotlin.application.impl.ComputeEngineServiceImpl
+import discord.bot.kotlin.application.impl.DiscordServiceImpl
 
 fun main(args: Array<String>) {
-  ComputeEngineServiceImpl().startInstance()
+//  ComputeEngineServiceImpl().startInstance()
+  DiscordServiceImpl().connectBot()
 }
