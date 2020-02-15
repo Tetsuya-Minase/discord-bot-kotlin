@@ -1,4 +1,4 @@
-package discord.bot.kotlin.application.impl
+package discord.bot.kotlin.domain.service.impl
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.HttpRequestInitializer
@@ -6,11 +6,12 @@ import com.google.api.client.http.HttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.compute.Compute
 import com.google.api.services.compute.ComputeScopes
+import com.google.api.services.compute.model.Instance
 import com.google.api.services.compute.model.InstanceList
 import com.google.api.services.compute.model.Operation
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
-import discord.bot.kotlin.application.ComputeEngineService
+import discord.bot.kotlin.domain.service.ComputeEngineService
 import java.io.IOException
 import java.util.*
 
@@ -32,12 +33,15 @@ class ComputeEngineServiceImpl : ComputeEngineService {
       credential = credential.createScoped(scopes)
     }
     httpRequestInitializer = HttpCredentialsAdapter(credential)
-    compute = Compute.Builder(httpTransport, JSON_FACTORY, httpRequestInitializer)
+    compute = Compute.Builder(
+      httpTransport,
+      JSON_FACTORY, httpRequestInitializer
+    )
       .setApplicationName(APPLICATION_NAME)
       .build()
   }
 
-  override fun startInstance() {
+  override fun startInstance(): String {
     try {
       // List out instances, looking for the one created by this sample app.
       val foundOurInstance: Boolean = printInstances(compute)
@@ -45,19 +49,26 @@ class ComputeEngineServiceImpl : ComputeEngineService {
         throw Exception("instance is not found.")
       }
       // execute start instance
-      val startOperation = compute.instances().start(PROJECT_ID, ZONE_NAME, APPLICATION_NAME)
+      val startOperation = compute.instances().start(
+        PROJECT_ID,
+        ZONE_NAME,
+        APPLICATION_NAME
+      )
       val operation = startOperation.execute()
 
 
       val error =
-        blockUntilComplete(compute, operation, OPERATION_TIMEOUT_MILLIS)
-      if (error == null) println("Success!") else println(error.toPrettyString())
+        blockUntilComplete(
+          compute, operation,
+          OPERATION_TIMEOUT_MILLIS
+        )
+      return if (error == null) "Success!" else error.toPrettyString()
     } catch (e: IOException) {
-      System.err.println(e.message)
+      return e.message.toString()
     }
   }
 
-  override fun stopInstance() {
+  override fun stopInstance(): String {
     try {
 
       // List out instances, looking for the one created by this sample app.
@@ -66,15 +77,33 @@ class ComputeEngineServiceImpl : ComputeEngineService {
         throw Exception("instance is not found.")
       }
       // execute stop instance
-      val stopInstance = compute.instances().stop(PROJECT_ID, ZONE_NAME, APPLICATION_NAME)
+      val stopInstance = compute.instances().stop(
+        PROJECT_ID,
+        ZONE_NAME,
+        APPLICATION_NAME
+      )
       val operation = stopInstance.execute()
 
       val error =
-        blockUntilComplete(compute, operation, OPERATION_TIMEOUT_MILLIS)
-      if (error == null) println("Success!") else println(error.toPrettyString())
+        blockUntilComplete(
+          compute, operation,
+          OPERATION_TIMEOUT_MILLIS
+        )
+      return if (error == null) "Success!" else error.toPrettyString()
     } catch (e: IOException) {
-      System.err.println(e.message)
+      return e.message.toString()
     }
+  }
+
+  override fun getInstanceList(): List<String> {
+    val instances: Compute.Instances.List = compute.instances().list(PROJECT_ID, ZONE_NAME)
+    val list: InstanceList = instances.execute()
+    if (list.items == null) {
+      return emptyList()
+    }
+    // TODO: enum化
+    return list.items.filter { instance: Instance -> instance.status == "RUNNING" }
+      .map { instance: Instance -> instance.name }
   }
 
   /**
@@ -84,18 +113,21 @@ class ComputeEngineServiceImpl : ComputeEngineService {
    * @return `true` if the instance created by this sample app is in the list
    */
   @Throws(IOException::class)
-  fun printInstances(compute: Compute): Boolean {
-    val instances: Compute.Instances.List = compute.instances().list(PROJECT_ID, ZONE_NAME)
+  private fun printInstances(compute: Compute): Boolean {
+    val instances: Compute.Instances.List = compute.instances().list(
+      PROJECT_ID,
+      ZONE_NAME
+    )
     val list: InstanceList = instances.execute()
     var found = false
-    if (list.getItems() == null) {
+    if (list.items == null) {
       println(
         "No instances found. Sign in to the Google Developers Console and create "
                 + "an instance at: https://console.developers.google.com/"
       )
     } else {
-      for (instance in list.getItems()) {
-        if (instance.getName().equals(APPLICATION_NAME)) {
+      for (instance in list.items) {
+        if (instance.name == APPLICATION_NAME) {
           found = true
         }
       }
@@ -132,7 +164,6 @@ class ComputeEngineServiceImpl : ComputeEngineService {
       if (elapsed >= timeout) {
         throw InterruptedException("Timed out waiting for operation to complete")
       }
-      println("waiting...")
       operation = if (zone != null) {
         val get =
           compute.zoneOperations()[PROJECT_ID, zone, opId]
