@@ -68,7 +68,7 @@ class ComputeEngineServiceImpl : ComputeEngineService {
     }
   }
 
-  override fun stopInstance() {
+  override fun stopInstance(): String {
     try {
 
       // List out instances, looking for the one created by this sample app.
@@ -89,9 +89,9 @@ class ComputeEngineServiceImpl : ComputeEngineService {
           compute, operation,
           OPERATION_TIMEOUT_MILLIS
         )
-      if (error == null) println("Success!") else println(error.toPrettyString())
+      return if (error == null) "Success!" else error.toPrettyString()
     } catch (e: IOException) {
-      System.err.println(e.message)
+      return e.message.toString()
     }
   }
 
