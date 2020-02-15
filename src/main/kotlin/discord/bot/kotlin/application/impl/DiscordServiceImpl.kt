@@ -63,6 +63,30 @@ class DiscordServiceImpl : DiscordService {
         }
       }
       .subscribe()
+
+    // start instance
+    client.eventDispatcher.on(MessageCreateEvent::class.java)
+      .map { messageCreateEvent: MessageCreateEvent -> messageCreateEvent.message }
+      .filter { message: Message ->
+        println(message.userMentionIds.size)
+        // TODO: BOTにのみメンションされたら反応したい
+        if (message.userMentionIds.size == 1) {
+          message.userMentionIds.map { i: Snowflake -> i.asString() }.any { id -> id == BOT_ID }
+        } else {
+          false
+        }
+      }
+      .filter { message: Message ->
+        message.content.map { content: String? -> content?.contains("start") ?: false }
+          .orElse(false)
+      }
+      .flatMap<MessageChannel> { message: Message -> message.channel }
+      .flatMap<Message> { channel: MessageChannel ->
+        val message = computeEngineService.startInstance()
+        if (message == "Success!") channel.createMessage("server start!") else channel.createMessage("error!")
+      }
+      .subscribe()
+
     client.login().block()
   }
 }

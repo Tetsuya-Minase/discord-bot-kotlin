@@ -41,7 +41,7 @@ class ComputeEngineServiceImpl : ComputeEngineService {
       .build()
   }
 
-  override fun startInstance() {
+  override fun startInstance(): String {
     try {
       // List out instances, looking for the one created by this sample app.
       val foundOurInstance: Boolean = printInstances(compute)
@@ -62,9 +62,9 @@ class ComputeEngineServiceImpl : ComputeEngineService {
           compute, operation,
           OPERATION_TIMEOUT_MILLIS
         )
-      if (error == null) println("Success!") else println(error.toPrettyString())
+      return if (error == null) "Success!" else error.toPrettyString()
     } catch (e: IOException) {
-      System.err.println(e.message)
+      return e.message.toString()
     }
   }
 
@@ -164,7 +164,6 @@ class ComputeEngineServiceImpl : ComputeEngineService {
       if (elapsed >= timeout) {
         throw InterruptedException("Timed out waiting for operation to complete")
       }
-      println("waiting...")
       operation = if (zone != null) {
         val get =
           compute.zoneOperations()[PROJECT_ID, zone, opId]
