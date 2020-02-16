@@ -4,7 +4,7 @@
 cd
 
 # create backup directory
-mkdir backup/`date +%Y%m%d`
+mkdir -p backup/`date +%Y%m%d`
 
 # copy
 cp minecraft/banned-ips.json backup/`date +%Y%m%d`/
