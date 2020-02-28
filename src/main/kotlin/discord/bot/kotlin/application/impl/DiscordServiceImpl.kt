@@ -1,7 +1,9 @@
 package discord.bot.kotlin.application.impl
 
 import discord.bot.kotlin.application.DiscordService
+import discord.bot.kotlin.domain.model.config.DiscordConfig
 import discord.bot.kotlin.domain.service.impl.ComputeEngineServiceImpl
+import discord.bot.kotlin.domain.service.impl.ConfigServiceImpl
 import discord4j.core.DiscordClient
 import discord4j.core.DiscordClientBuilder
 import discord4j.core.`object`.entity.Message
@@ -12,13 +14,12 @@ import discord4j.core.event.domain.message.MessageCreateEvent
 
 
 class DiscordServiceImpl : DiscordService {
-  private val BOT_ID = ""
-  private val DISCORD_TOKEN = ""
   private val computeEngineService: ComputeEngineServiceImpl = ComputeEngineServiceImpl()
+  private val discordConfig: DiscordConfig = ConfigServiceImpl().getDiscordConfig()
 
   override fun connectBot() {
     val client: DiscordClient =
-      DiscordClientBuilder(DISCORD_TOKEN).build()
+      DiscordClientBuilder(discordConfig.discordToken).build()
 
     client.eventDispatcher.on(ReadyEvent::class.java)
       .subscribe { ready: ReadyEvent -> println("Logged in as " + ready.self.username) }
@@ -42,7 +43,7 @@ class DiscordServiceImpl : DiscordService {
         println(message.userMentionIds.size)
         // TODO: BOTにのみメンションされたら反応したい
         if (message.userMentionIds.size == 1) {
-          message.userMentionIds.map { i: Snowflake -> i.asString() }.any { id -> id == BOT_ID }
+          message.userMentionIds.map { i: Snowflake -> i.asString() }.any { id -> id == discordConfig.botId }
         } else {
           false
         }
@@ -71,7 +72,7 @@ class DiscordServiceImpl : DiscordService {
         println(message.userMentionIds.size)
         // TODO: BOTにのみメンションされたら反応したい
         if (message.userMentionIds.size == 1) {
-          message.userMentionIds.map { i: Snowflake -> i.asString() }.any { id -> id == BOT_ID }
+          message.userMentionIds.map { i: Snowflake -> i.asString() }.any { id -> id == discordConfig.botId }
         } else {
           false
         }
@@ -94,7 +95,7 @@ class DiscordServiceImpl : DiscordService {
         println(message.userMentionIds.size)
         // TODO: BOTにのみメンションされたら反応したい
         if (message.userMentionIds.size == 1) {
-          message.userMentionIds.map { i: Snowflake -> i.asString() }.any { id -> id == BOT_ID }
+          message.userMentionIds.map { i: Snowflake -> i.asString() }.any { id -> id == discordConfig.botId }
         } else {
           false
         }

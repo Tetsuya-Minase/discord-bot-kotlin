@@ -6,6 +6,5 @@ package discord.bot.kotlin
 import discord.bot.kotlin.application.impl.DiscordServiceImpl
 
 fun main(args: Array<String>) {
-//  ComputeEngineServiceImpl().startInstance()
   DiscordServiceImpl().connectBot()
 }
