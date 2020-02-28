@@ -108,6 +108,34 @@ class DiscordServiceImpl : DiscordService {
       }
       .subscribe()
 
+    // get help
+    client.eventDispatcher.on(MessageCreateEvent::class.java)
+      .map { messageCreateEvent: MessageCreateEvent -> messageCreateEvent.message }
+      .filter { message: Message ->
+        // TODO: BOTにのみメンションされたら反応したい
+        if (message.userMentionIds.size == 1) {
+          message.userMentionIds.map { i: Snowflake -> i.asString() }.any { id -> id == discordConfig.botId }
+        } else {
+          false
+        }
+      }
+      .filter { message: Message ->
+        message.content.map { content: String? -> content?.contains("help") ?: false }
+          .orElse(false)
+      }
+      .flatMap<MessageChannel> { message: Message -> message.channel }
+      .flatMap<Message> { channel: MessageChannel ->
+        val helpMessage: String = """
+          command list
+          ・start: start minecraft instance.
+          ・stop: stop minecraft instance.
+          ・list: get active instances.
+          ・help: get help to use bot.
+        """.trimIndent()
+        channel.createMessage(helpMessage)
+      }
+      .subscribe()
+
     client.login().block()
   }
 }
