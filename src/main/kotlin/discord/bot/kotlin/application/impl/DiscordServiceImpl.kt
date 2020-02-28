@@ -40,7 +40,6 @@ class DiscordServiceImpl : DiscordService {
     client.eventDispatcher.on(MessageCreateEvent::class.java)
       .map { messageCreateEvent: MessageCreateEvent -> messageCreateEvent.message }
       .filter { message: Message ->
-        println(message.userMentionIds.size)
         // TODO: BOTにのみメンションされたら反応したい
         if (message.userMentionIds.size == 1) {
           message.userMentionIds.map { i: Snowflake -> i.asString() }.any { id -> id == discordConfig.botId }
@@ -69,7 +68,6 @@ class DiscordServiceImpl : DiscordService {
     client.eventDispatcher.on(MessageCreateEvent::class.java)
       .map { messageCreateEvent: MessageCreateEvent -> messageCreateEvent.message }
       .filter { message: Message ->
-        println(message.userMentionIds.size)
         // TODO: BOTにのみメンションされたら反応したい
         if (message.userMentionIds.size == 1) {
           message.userMentionIds.map { i: Snowflake -> i.asString() }.any { id -> id == discordConfig.botId }
@@ -92,7 +90,6 @@ class DiscordServiceImpl : DiscordService {
     client.eventDispatcher.on(MessageCreateEvent::class.java)
       .map { messageCreateEvent: MessageCreateEvent -> messageCreateEvent.message }
       .filter { message: Message ->
-        println(message.userMentionIds.size)
         // TODO: BOTにのみメンションされたら反応したい
         if (message.userMentionIds.size == 1) {
           message.userMentionIds.map { i: Snowflake -> i.asString() }.any { id -> id == discordConfig.botId }
