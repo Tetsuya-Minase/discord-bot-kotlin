@@ -24,18 +24,6 @@ class DiscordServiceImpl : DiscordService {
     client.eventDispatcher.on(ReadyEvent::class.java)
       .subscribe { ready: ReadyEvent -> println("Logged in as " + ready.self.username) }
 
-    client.eventDispatcher.on(MessageCreateEvent::class.java)
-      .map { obj: MessageCreateEvent -> obj.message }
-      .filter { msg: Message ->
-        msg.content.map { anObject: String? -> "!ping".equals(anObject) }.orElse(false)
-      }
-      .flatMap<MessageChannel> { obj: Message -> obj.channel }
-      .flatMap<Message> { channel: MessageChannel ->
-        // ここでなにかやる
-        channel.createMessage("Pong!")
-      }
-      .subscribe()
-
     // instance listを取得
     client.eventDispatcher.on(MessageCreateEvent::class.java)
       .map { messageCreateEvent: MessageCreateEvent -> messageCreateEvent.message }
