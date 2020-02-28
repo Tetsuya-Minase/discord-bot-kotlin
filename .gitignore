@@ -9,3 +9,6 @@ build
 
 # credentials
 credential/
+
+# config
+config.properties

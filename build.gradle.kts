@@ -31,3 +31,18 @@ application {
   // Define the main class for the application
   mainClassName = "discord.bot.kotlin.AppKt"
 }
+
+val jar by tasks.getting(Jar::class) {
+  manifest {
+    attributes["Main-Class"] = "discord.bot.kotlin.AppKt"
+  }
+
+  from(
+    configurations.compile.get().map {
+      if (it.isDirectory) it else zipTree(it)
+    }
+  )
+  configurations["compileClasspath"].forEach { file: File ->
+    from(zipTree(file.absoluteFile))
+  }
+}

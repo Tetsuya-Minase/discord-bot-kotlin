@@ -11,6 +11,7 @@ import com.google.api.services.compute.model.InstanceList
 import com.google.api.services.compute.model.Operation
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
+import discord.bot.kotlin.domain.model.config.ComputeEngineConfig
 import discord.bot.kotlin.domain.service.ComputeEngineService
 import java.io.IOException
 import java.util.*
@@ -20,6 +21,7 @@ class ComputeEngineServiceImpl : ComputeEngineService {
   private var httpTransport: HttpTransport = GoogleNetHttpTransport.newTrustedTransport()
   private var compute: Compute
   private var httpRequestInitializer: HttpRequestInitializer
+  private val config: ComputeEngineConfig = ConfigServiceImpl().getComputeEngineConfig()
 
   init {
     // Authenticate using Google Application Default Credentials.
@@ -37,7 +39,7 @@ class ComputeEngineServiceImpl : ComputeEngineService {
       httpTransport,
       JSON_FACTORY, httpRequestInitializer
     )
-      .setApplicationName(APPLICATION_NAME)
+      .setApplicationName(config.applicationName)
       .build()
   }
 
@@ -50,9 +52,9 @@ class ComputeEngineServiceImpl : ComputeEngineService {
       }
       // execute start instance
       val startOperation = compute.instances().start(
-        PROJECT_ID,
-        ZONE_NAME,
-        APPLICATION_NAME
+        config.projectId,
+        config.zoneName,
+        config.applicationName
       )
       val operation = startOperation.execute()
 
@@ -78,9 +80,9 @@ class ComputeEngineServiceImpl : ComputeEngineService {
       }
       // execute stop instance
       val stopInstance = compute.instances().stop(
-        PROJECT_ID,
-        ZONE_NAME,
-        APPLICATION_NAME
+        config.projectId,
+        config.zoneName,
+        config.applicationName
       )
       val operation = stopInstance.execute()
 
@@ -96,7 +98,7 @@ class ComputeEngineServiceImpl : ComputeEngineService {
   }
 
   override fun getInstanceList(): List<String> {
-    val instances: Compute.Instances.List = compute.instances().list(PROJECT_ID, ZONE_NAME)
+    val instances: Compute.Instances.List = compute.instances().list(config.projectId, config.zoneName)
     val list: InstanceList = instances.execute()
     if (list.items == null) {
       return emptyList()
@@ -115,8 +117,8 @@ class ComputeEngineServiceImpl : ComputeEngineService {
   @Throws(IOException::class)
   private fun printInstances(compute: Compute): Boolean {
     val instances: Compute.Instances.List = compute.instances().list(
-      PROJECT_ID,
-      ZONE_NAME
+      config.projectId,
+      config.zoneName
     )
     val list: InstanceList = instances.execute()
     var found = false
@@ -127,7 +129,7 @@ class ComputeEngineServiceImpl : ComputeEngineService {
       )
     } else {
       for (instance in list.items) {
-        if (instance.name == APPLICATION_NAME) {
+        if (instance.name == config.applicationName) {
           found = true
         }
       }
@@ -166,11 +168,11 @@ class ComputeEngineServiceImpl : ComputeEngineService {
       }
       operation = if (zone != null) {
         val get =
-          compute.zoneOperations()[PROJECT_ID, zone, opId]
+          compute.zoneOperations()[config.projectId, zone, opId]
         get.execute()
       } else {
         val get =
-          compute.globalOperations()[PROJECT_ID, opId]
+          compute.globalOperations()[config.projectId, opId]
         get.execute()
       }
       if (operation != null) {
@@ -181,9 +183,6 @@ class ComputeEngineServiceImpl : ComputeEngineService {
   }
 
   companion object {
-    private const val APPLICATION_NAME = ""
-    private const val PROJECT_ID = ""
-    private const val ZONE_NAME = ""
     private const val OPERATION_TIMEOUT_MILLIS: Long = 60 * 1000
     private val JSON_FACTORY = JacksonFactory.getDefaultInstance()
   }
