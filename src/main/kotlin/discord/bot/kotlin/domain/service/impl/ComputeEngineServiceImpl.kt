@@ -105,6 +105,7 @@ class ComputeEngineServiceImpl : ComputeEngineService {
     }
     // TODO: enum化
     return list.items.filter { instance: Instance -> instance.status == "RUNNING" }
+      .filter { instance: Instance -> !instance.name.contains("bot-instance") }
       .map { instance: Instance -> instance.name }
   }
 
